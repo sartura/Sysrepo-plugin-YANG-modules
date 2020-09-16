@@ -1,0 +1,51 @@
+module generic-ubus-system {
+    yang-version 1.1;
+    namespace "https://terastream/ns/yang/generic-ubus-system";
+    prefix "sys";
+
+    revision 2019-06-24 {
+        description "Initial revision.";
+    }
+
+
+   container generic-ubus-system {
+       config false;
+       container board {
+        leaf kernel {
+            type string;
+        }
+        leaf hostname {
+            type string;
+        }
+        leaf system {
+            type string;
+        }
+        leaf model {
+            type string;
+        }
+        leaf board_name {
+            type string;
+        }
+        container release {
+            leaf distribution {
+                type string;
+            }
+            leaf version {
+                type string;
+            }
+            leaf revision {
+                type string;
+            }
+            leaf codename {
+                type string;
+            }
+            leaf target {
+                type string;
+            }
+            leaf description {
+                type string;
+            }
+        }
+    }
+   }
+}

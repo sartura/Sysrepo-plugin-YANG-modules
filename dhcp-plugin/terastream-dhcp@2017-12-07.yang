@@ -1,0 +1,342 @@
+module terastream-dhcp {
+
+    namespace "http://terastrm.net/ns/yang/terastream-dhcp";
+
+    prefix "ts-dhcp";
+
+    import ietf-inet-types {
+      prefix inet;
+    }
+
+    import ietf-yang-types {
+      prefix yang;
+    }
+
+    organization
+        "Deutsche Telekom AG";
+
+    contact
+        "Landgrabenweg 151
+        53227 Bonn, Germany";
+
+    description
+        "This module defines DHCP used in the TeraStream home gateway project.";
+
+    revision "2017-12-07" {
+        description
+            "Version 0.1.0";
+    }
+
+    typedef server-state {
+      type enumeration {
+        enum "server" {
+          description
+            "Enable the server.";
+        }
+        enum "relay" {
+          description
+            "Relay the server.";
+        }
+        enum "disabled" {
+          description
+            "Disable the server.";
+        }
+      }
+      description
+        "Specifies the server mode.";
+    }
+
+
+    container dhcp-servers {
+      description
+        "Data nodes for the operational state of dhcp server";
+      list dhcp-server {
+        key "name";
+        description
+          "The list of dhcp server config sections on the device";
+        leaf name {
+          description
+            "The name of the dhcp UCI config section";
+          type string;
+        }
+        leaf enable {
+          description
+            "Specifies whether dnsmasq should ignore this pool
+            if set to false.";
+          type boolean;
+          default "true";
+        }
+        leaf interface {
+          description
+            "Specifies the interface associated with this DHCP
+            address pool; must be one of the interfaces defined
+            in /etc/config/network.";
+          type string;
+          mandatory true;
+        }
+        leaf start {
+          description
+            "Specifies the offset from the network address of the
+            underlying interface to calculate the minimum address
+            that may be leased to clients. It may be greater
+            than 255.";
+          type uint32;
+          default "100";
+        }
+        leaf stop {
+          must ". >= ../start";
+          description
+            "Specifies the max address pool.";
+          type uint32;
+          default "250";
+        }
+        leaf leasetime {
+          description
+            "Specifies the lease time of addresses handed out to
+            clients, for example 12h or 30m. Default is 12 hours";
+          type uint32 {
+            range "60 .. max";
+          }
+          default "43200";
+          units seconds;
+        }
+        leaf dhcpv6 {
+          description
+            "Specifies whether DHCPv6 server should be enabled
+            (server), relayed (relay) or disabled (disabled).";
+          type server-state;
+        }
+        leaf ra {
+          description
+            "Specifies whether Router Advertisements should be
+            enabled (server), relayed (relay) or
+            disabled (disabled).";
+          type server-state;
+        }
+        leaf ra_management {
+          description
+            "RA management mode, default 1:
+            0: no M-Flag but A-Flag
+            1: both M and A
+            2: M but not A
+            A-Flag: tell client to use auto-configuration i.e. SLAAC
+            M-Flag: notify client that DHCPv6 server is available";
+          type enumeration {
+            enum 0;
+            enum 1;
+            enum 2;
+          }
+          default 1;
+        }
+        leaf sntp {
+          type string;
+        }
+        leaf-list dhcp_option {
+          description
+            "The ID dhcp_option here must be with written with an
+            underscore. OpenWrt will translate this to –dhcp-option,
+            with a hyphen, as ultimately used by dnsmasq. Multiple
+            option values can be given for this network-id, with a
+            space between them and the total string between ''. E.g.
+            '26,1470' or 'option:mtu, 1470' that can assign an MTU
+            per DHCP. Your client must accept MTU by DHCP for this to
+            work. Or '3,192.168.1.1 6,192.168.1.1' to give out gateway
+            and dns server addresses.";
+          type string;
+        }
+        leaf dynamicdhcp {
+          description
+            "Dynamically allocate client addresses, if set to 0 only
+            clients present in the ethers files are served.";
+          type boolean;
+          default "true";
+        }
+        leaf force {
+          description
+            "Forces DHCP serving on the specified interface even if
+            another DHCP server is detected on the same network segment.";
+          type boolean;
+          default "false";
+        }
+        leaf ndp {
+          description
+            "Specifies whether NDP should be relayed relay or disabled
+            none.";
+          type enumeration {
+            enum "relay";
+            enum "none";
+          }
+        }
+        leaf master {
+          description
+            "Specifies whether DHCPv6, RA and NDP in relay mode is a
+            master interface or not.";
+          type boolean;
+          default "false";
+        }
+        leaf networkid {
+          description
+            "The dhcp functionality defined in the dhcp section islimited
+            to the interface indicated here through its network-id. In
+            case omitted the system tries to know the network-id via the
+            'interface' setting in this dhcp section, through consultation
+            of /etc/config/network. Some IDs get assigned dynamically, are
+            not provided by network, but still can be set here.";
+          type string;
+        }
+      }
+    }
+
+    container domains {
+      description
+        "List of domains";
+      leaf-list domain {
+        description
+          "DNS domain handed out to DHCP clients";
+        type string;
+      }
+    }
+
+    container dhcp-clients {
+      description
+        "Data nodes for the operational state of dhcp clients";
+      list dhcp-client {
+        key "name";
+        description
+          "The list of dhcp client config sections on the device";
+        leaf name {
+          type string;
+          description
+          "The name of the dhcp config section";
+        }
+        leaf proto {
+          description
+            "Used protocol.";
+          type string;
+        }
+        leaf accept_ra {
+          description
+            "Specifies whether to accept IPv6 Router Advertisements on
+            this interface";
+          type boolean;
+          default "true";
+        }
+        leaf request_pd {
+          type string;
+        }
+        leaf request_na {
+          type string;
+        }
+        leaf aftr_v4_local {
+          type inet:ipv4-address-no-zone;
+        }
+        leaf aftr_v4_remote {
+          type inet:ipv4-address-no-zone;
+        }
+        leaf reqopts {
+          description
+            "Space-separated list of additional DHCP options to request
+            from the server.";
+          type string;
+        }
+      }
+    }
+
+    container dhcp-v4-leases {
+      description
+        "DHCP leases for IPv4";
+      config false;
+      list dhcp-v4-lease {
+        key "name";
+        description
+          "One instance of a DHCP IPv4 lease";
+        leaf name {
+          description
+            "The name of the DHCPv4 lease";
+          type string;
+        }
+        leaf leasetime {
+          description
+            "DHCPv4 address leasetime.";
+          type uint32;
+        }
+        leaf hostname {
+          description
+            "Hostname of the device.";
+          type string;
+        }
+        leaf ipaddr {
+          description
+            "Assigned IPv4 address.";
+          type inet:ipv4-address-no-zone;
+        }
+        leaf macaddr {
+          description
+            "Devices mac address.";
+          type yang:phys-address;
+        }
+        leaf device {
+          description
+            "Device interface.";
+          type string;
+        }
+        leaf connected {
+          description
+            "Status of the connected device.";
+          type boolean;
+        }
+      }
+    }
+
+    container dhcp-v6-leases {
+      description
+        "DHCP leases for IPv6";
+      config false;
+      list dhcp-v6-lease {
+        key "assigned";
+        description
+          "One instance of a DHCP IPv6 lease.";
+        leaf duid {
+          description
+            "DHCP Unique Identifier, the DHCPv6-DUID of this host.";
+          type string;
+        }
+        leaf iaid {
+          description
+            "Interface Association Identifier.";
+          type uint32;
+        }
+        leaf interface {
+          description
+            "Used interface.";
+          type string;
+        }
+        leaf hostname {
+          description
+            "Hostname of the device.";
+          type string;
+        }
+        leaf assigned {
+          description
+            "Network to host long.";
+          type uint32;
+        }
+        leaf length {
+          description
+            "length == 128 -> IA_NA, length <= 64 -> IA_PD.";
+          type uint8;
+        }
+        leaf-list ipv6 {
+          description
+            "List of leased IPv6 addresses.";
+          type inet:ipv6-address-no-zone;
+        }
+        leaf valid {
+          description
+            "Remaining valid lifetime.";
+          type uint32;
+          units seconds;
+        }
+      }
+    }
+}

@@ -1,0 +1,53 @@
+module terastream-interfaces-opto {
+
+  namespace "http://terastrm.net/ns/yang/terastream-interfaces-opto";
+
+  prefix ts-opto;
+
+  import ietf-interfaces {
+    prefix if;
+  }
+
+  organization "DT";
+
+  description
+    "Optical data";
+
+  revision "2017-09-27" {
+    description
+     "Version 0.1.0 -- Initial version.";
+  }
+
+  augment "/if:interfaces-state/if:interface" {
+    description
+     "Optical operational data";
+    leaf rx-pwr {
+      description "Received optical power";
+      type decimal64 {
+           fraction-digits 4;
+      }
+      units "dBm";
+    }
+    leaf tx-pwr {
+      description "Sent optical power";
+      type decimal64 {
+           fraction-digits 4;
+      }
+      units "dBm";
+    }
+    leaf current {
+      description "Optical current";
+      type decimal64 {
+           fraction-digits 4;
+      }
+      units "mA";
+    }
+    leaf voltage {
+      description "Optical voltage";
+      type decimal64 {
+           fraction-digits 4;
+      }
+      units "V";
+    }
+  }
+}

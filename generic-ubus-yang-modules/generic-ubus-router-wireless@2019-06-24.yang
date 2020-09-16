@@ -1,0 +1,48 @@
+module generic-ubus-router-wireless {
+	yang-version 1.1;
+	namespace "https://terastream/ns/yang/generic-ubus-router-wireless";
+	prefix "gurw";
+
+
+	revision 2019-06-24 {
+		description "Initial revision.";
+	}
+
+	container generic-ubus-router-wireless {
+		config false;
+
+		container status {
+			leaf wldev {
+				type string;
+			}
+			leaf radio {
+				type int32;
+			}
+			leaf ssid {
+				type string;
+			}
+			leaf bssid {
+				type string;
+			}
+			leaf encryption {
+				type string;
+			}
+			leaf frequency {
+				type int32;
+			}
+			leaf channel {
+				type int32;
+			}
+			leaf bandwidth {
+				type int32;
+			}
+			leaf noise {
+				type int32;
+			}
+			leaf rate {
+				type int32;
+			}
+
+		}
+	}
+}

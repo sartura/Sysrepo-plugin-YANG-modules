@@ -1,0 +1,531 @@
+module terastream-wireless {
+
+    namespace "http://terastrm.net/ns/yang/terastream-wireless";
+
+    prefix "ts-ws";
+
+    import ietf-yang-types {
+      prefix yang;
+    }
+
+    organization
+        "Deutsche Telekom AG";
+
+    contact
+        "Hmm";
+
+    description
+        "This module defines wireless used in the TeraStream home gateway project.";
+
+    revision "2017-08-08" {
+        description
+            "Version 0.1.0 -- Initial version.";
+    }
+
+    typedef encryption-type {
+        type enumeration {
+            enum "none";      // None
+            enum "wep-open";  // WEP
+            enum "psk2";      // WPA2 Personal (PSK)
+            enum "psk-psk2";  // WPA/WPA2 Personal (PSK) Mixed Mode
+            enum "wpa2";      // WPA2 Enterprise
+            enum "wpa-wpa2";  // WPA/WPA2 Enterprise Mixed Mode
+        }
+    }
+
+    typedef channel-type {
+        type enumeration {
+            enum "auto";
+            enum "1";
+            enum "2";
+            enum "3";
+            enum "4";
+            enum "5";
+            enum "6";
+            enum "7";
+            enum "8";
+            enum "9";
+            enum "10";
+            enum "11";
+            enum "12";
+            enum "13";
+            enum "14";
+            enum "15";
+            enum "36";
+            enum "40";
+            enum "44";
+            enum "48";
+            enum "52";
+            enum "56";
+            enum "60";
+            enum "64";
+            enum "100";
+            enum "104";
+            enum "108";
+            enum "112";
+            enum "116";
+            enum "132";
+            enum "136";
+            enum "140";
+        }
+    }
+
+    container "apsteering" {
+      description
+        "apsteering.";
+
+      leaf enabled {
+           type boolean;
+           description
+            "Enable AP Steering mechanism";
+           default false;
+      }
+
+      leaf monitor_interval {
+           type int32;
+           description
+            "The interval to monitor the RSSI value of stations, unit: seconds";
+           default 10;
+      }
+
+      leaf rssi_threshold {
+           type int8 {
+               range "-100 .. 0";
+           }
+           description
+            "Station is disassociated if its RSSI falls below the threshold value (given that another Wi-Fi AP is detected in the network)";
+           default -80;
+      }
+
+      leaf reassoc_timer {
+           type uint32 {
+               range "1 .. max";
+           }
+           description
+            "If the disassociated station comes back within the given amount of seconds, do not disassociate again until the retry_interval times out.";
+           default 5;
+      }
+
+      leaf retry_interval {
+           type uint32 {
+               range "60 .. max";
+           }
+           description
+            "The time which as to pass to disassociate a station again";
+           default 3600;
+      }
+    }
+
+    container "bandsteering" {
+      description
+        "bandsteering.";
+
+      leaf enabled {
+           description
+            "Enable Band Steering mechanism";
+           type boolean;
+           default false;
+      }
+
+      leaf policy {
+           description
+            "Band Steering policy: False: RSSI, True: Bandwidth Usage";
+           type boolean;
+           default false;
+      }
+      leaf rssi_threshold {
+           description
+            "Dualband station is steered to 2.4GHz radio when its RSSI falls below the threshold value";
+           type int8 {
+               range "-100 .. 0";
+           }
+           default -75;
+      }
+      leaf bw_util {
+           description
+            "Inactive dualband station are steered to 2.4GHz radio when the bandwidth usage on 5GHz band reaches the given bandwidth utilization value";
+           type uint8 {
+               range "0 .. 100";
+           }
+           default 60;
+      }
+    }
+
+    container "devices" {
+      description
+        "Wireless devices.";
+
+      list device {
+
+        key "name";
+
+        leaf name {
+          type string;
+        }
+
+        leaf type {
+           type string;
+        }
+
+        leaf country {
+             type string;
+             default "EU/13";
+        }
+
+        leaf frequencyband {
+             type enumeration {
+                 enum "5";
+                 enum "2.4";
+             }
+             units GHz;
+             default "2.4";
+        }
+
+        leaf bandwidth {
+             type uint8 {
+                 range "20 | 40 | 80";
+             }
+             default 80;
+        }
+
+        leaf channel {
+             type channel-type;
+             default "auto";
+        }
+
+        leaf obss_coex {
+             type boolean;
+             default "true";
+        }
+
+        leaf scantimer {
+             type int32;
+             default 0;
+        }
+
+        leaf wmm  {
+             type boolean;
+             default "true";
+        }
+
+        leaf wmm_noack {
+             type boolean;
+             default "false";
+        }
+
+        leaf wmm_apsd {
+             type boolean;
+             default "true";
+        }
+
+        leaf txpower {
+             type int32;
+             default 100;
+        }
+
+        leaf rateset {
+             type enumeration {
+                 enum "default";
+             }
+             default "default";
+        }
+
+        leaf frag {
+             type int32;
+             default 2346;
+        }
+
+        leaf rts {
+             type int32;
+             default 2347;
+        }
+        
+        leaf dtim_period {
+             type int32;
+             default 1;
+        }
+        
+        leaf beacon_int {
+             type int32;
+             default 100;
+        }
+        
+        leaf rxchainps {
+             type boolean;
+             default "true";
+        }
+
+        leaf rxchainps_qt {
+             type int32;
+             default 10;
+        }
+
+        leaf rxchainps_pps {
+             type int32;
+             default 10;
+        }
+
+        leaf rifs {
+             type boolean;
+             default "false";
+        }
+
+        leaf rifs_advert {
+             type boolean;
+             default "true";
+        }
+
+        leaf maxassoc {
+             type int32;
+             default 32;
+        }
+
+        leaf dfsc {
+             type boolean;
+             default "true";
+        }
+
+        leaf hwmode {
+             type string;
+             default "auto";
+        }
+
+        leaf enabled {
+             type boolean;
+             description
+              "enable/disable the interface";
+             default true;
+        }
+
+        leaf frameburst {
+             type boolean;
+             default "false";
+        }
+
+        leaf beamforming {
+             type boolean;
+             default "false";
+        }
+
+        leaf atf {
+             type boolean;
+             default "false";
+        }
+
+        leaf doth {
+             type int32;
+        }
+
+        list interface {
+            key "name";
+
+            description
+              "List of configured interfaces on device";
+
+            leaf name {
+                type string;
+                description
+                 "Name of the uci config section. This is autogenerated by SWIG if it doesn't exist";
+            }
+
+            leaf device {
+                 type string;
+            }
+
+            leaf ifname {
+                 type string;
+            }
+
+            leaf network {
+                 type string;
+            }
+
+            leaf mode {
+                 type string;
+                 default "ap";
+            }
+
+            leaf ssid {
+                 type string;
+            }
+
+            leaf encryption {
+                 description
+                  "Wireless encryption method";
+                 type encryption-type;
+                 default "none";
+            }
+
+            must "(encryption = 'psk-psk2' and (cipher = 'auto' or cipher = 'ccmp' or cipher = 'tkip+ccmp')) or " +
+                 "(encryption = 'psk2'     and (cipher = 'auto' or cipher = 'ccmp')) or " +
+                 "(encryption = 'wep-open') or " +
+                 "(encryption = 'wpa2') or " +
+                 "(encryption = 'wpa-wpa2') or " +
+                 "(encryption = 'none')";
+
+            leaf cipher {
+                 when "../encryption != 'none' and ../encryption != 'wep-open' and ../encryption != 'wpa2' and ../encryption != 'wpa-wpa2'";
+                 type enumeration {
+                     enum "auto";      // Auto
+                     enum "ccmp";      // CCMP (AES)
+                     enum "tkip+ccmp"; // TKIP/CCMP (AES)
+                 }
+                 default "auto";
+            }
+
+            leaf key {
+                 when "../encryption = 'psk2' or ../encryption = 'psk-psk2'";
+                 type string {
+                     length "8 .. 63";
+                 }
+            }
+
+            leaf key_index {
+                 when "../encryption = 'wep-open'";
+                 type uint8 {
+                     range "1 .. 4";
+                 }
+                 default 1;
+            }
+
+            leaf key1 {
+                 when "../encryption = 'wep-open'";
+                 type yang:hex-string {
+                     length "10..26";
+                 }
+            }
+
+            leaf key2 {
+                 when "../encryption = 'wep-open'";
+                 type yang:hex-string {
+                     length "10..26";
+                 }
+            }
+
+            leaf key3 {
+                 when "../encryption = 'wep-open'";
+                 type yang:hex-string {
+                     length "10..26";
+                 }
+            }
+
+            leaf key4 {
+                 when "../encryption = 'wep-open'";
+                 type yang:hex-string {
+                     length "10..26";
+                 }
+            }
+
+            leaf radius_server {
+                 when "../encryption = 'wpa2' or ../encryption = 'wpa-wpa2'";
+                 type string;
+            }
+
+            leaf radius_port {
+                 when "../encryption = 'wpa2' or ../encryption = 'wpa-wpa2'";
+                 type uint16 {
+                     range "1 .. 65535";
+                 }
+            }
+
+            leaf radius_secret {
+                 when "../encryption = 'wpa2' or ../encryption = 'wpa-wpa2'";
+                 type int32;
+            }
+
+            leaf gtk_rekey {
+                 type int32;
+                 default 3600;
+            }
+
+            leaf net_reauth {
+                 type int32;
+                 default 36000;
+            }
+
+            leaf wps_pbc {
+                 type boolean;
+                 default "false";
+            }
+
+            leaf wmf_bss_enable {
+                 type boolean;
+                 default "false";
+            }
+
+            leaf bss_max {
+                 type uint8 {
+                     range "0 .. 128";
+                 }
+                 default 32;
+            }
+
+            leaf closed {
+                 type boolean;
+                 default "false";
+            }
+
+            leaf isolate {
+                 type boolean;
+                 default "false";
+            }
+
+            leaf enabled {
+                type boolean;
+                description
+                 "enable/disable the interface";
+                default true;
+            }
+
+            leaf macfilter {
+                 type int32;
+                 default 0;
+            }
+
+            leaf hidden {
+                 type boolean;
+                 description
+                  "Turns off SSID broadcasting if set to true";
+                 default false;
+            }
+
+            //TODO leaf-list maclist;
+          }
+      }
+    }
+    container "devices-state" {
+
+      config false;
+
+      description
+        "Wireless devices.";
+
+      
+      list device {
+
+        key "name";
+
+        leaf name {
+          type string;
+        }
+
+        leaf channel {
+          type channel-type;
+        }
+
+        leaf ssid {
+          type string;
+        }
+
+        leaf encryption {
+          type encryption-type;
+        }
+
+        leaf up {
+          type boolean;
+          description
+            "Is the interface active or not.";
+        }
+      }
+    }
+}
