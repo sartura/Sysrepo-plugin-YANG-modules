@@ -1,7 +1,7 @@
 module generic-ubus-system {
     yang-version 1.1;
     namespace "https://terastream/ns/yang/generic-ubus-system";
-    prefix "sys";
+    prefix "gen-ubus-sys";
 
     revision 2019-06-24 {
         description "Initial revision.";
