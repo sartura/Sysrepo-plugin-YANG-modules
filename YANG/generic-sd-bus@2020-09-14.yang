@@ -1,0 +1,125 @@
+/*
+ * @file generic-sd-bus.c
+ * @authors Borna Blazevic <borna.blazevic@sartura.hr>
+ *
+ * @brief Implements tha main logic of the generic sd-bus plugin.
+ *        Main functionalities include:
+ *          + calling any available sd-bus method, and returning its response
+ *
+ * @copyright
+ * Copyright (C) 2020 Deutsche Telekom AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+/*=========================Includes===========================================*/
+module generic-sd-bus {
+     yang-version 1.1;
+     namespace "https://terastream/ns/yang/generic-sd-bus";
+     prefix "ts-gsb";
+
+     organization
+        "Deutsche Telekom AG";
+
+    contact
+        "Landgrabenweg 151
+        53227 Bonn, Germany";
+
+
+     description
+          "The module defines RPC for sd-bus methods available on the system.";
+
+     revision "2020-09-14" {
+          description "Initial revision.";
+     }
+
+     rpc sd-bus-call {
+          description
+               "RPC for implementig the sd-bus method call of an sd-bus service.";
+          status current;
+          input {
+               list sd-bus-message {
+                    key "sd-bus sd-bus-service sd-bus-object-path sd-bus-interface sd-bus-method";
+                    
+                    leaf sd-bus {
+                         description "sd-bus bus to contact.";
+                         mandatory true;
+                         type enumeration {
+                              enum SYSTEM;
+                              enum USER;
+                         }
+                    }
+
+                    leaf sd-bus-service {
+                         description "sd-bus service to contact.";
+                         mandatory true;
+                         type string;
+                    }
+
+                    leaf sd-bus-object-path {
+                         description "sd-bus object path.";
+                         mandatory true;
+                         type string;
+                    }
+
+                    leaf sd-bus-interface {
+                         description "sd-bus interface name.";
+                         mandatory true;
+                         type string;
+                    }
+
+                    leaf sd-bus-method {
+                         description "sd-bus method name.";
+                         mandatory true;
+                         type string;
+                    }
+
+                    leaf sd-bus-method-signature {
+                         description "sd-bus method signature.";
+                         mandatory true;
+                         type string;
+                    }
+
+                    leaf sd-bus-method-arguments {
+                         description "sd-bus method arguments in busctl format.";
+                         mandatory true;
+                         type string;
+                         
+                    }
+               }
+          }
+          output {
+               list sd-bus-result {
+                    description "sd-bus call result.";
+                    key sd-bus-method;
+                    leaf sd-bus-method {
+                         description
+                              "sd-bus object, sd-bus method and message that was
+                              called to produce this result";
+                         type string;
+                    }
+                    leaf sd-bus-response {
+                         description
+                              "The response message of the invoked sd-bus call";
+                         type string;
+                    }
+                    leaf sd-bus-signature {
+                         description
+                              "The response message signature of the invoked sd-bus call";
+                         type string;
+                    }
+               }
+          }
+     }
+}
